@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,68 +14,64 @@ import com.riccardo.giangiulio.utility.database.DatabaseConnection;
 public class NotificationDAO {
     private Connection connection = DatabaseConnection.getInstance().getConnection();
 
-    public void createNotification(Notification notification) {
-        String insertSQL = "INSERT INTO public.\"Notification\"(message, opened, sent_dt, activity_id, user_id) VALUES (?, ?, ?, ?, ?)";
+    public Notification createNotification(Notification notification) {
+        String insertNotificationSQL = "INSERT INTO public.\"Notification\"(message, opened, sent_dt, activity_id, user_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
-            ps.setString(1, notification.getMessage());
-            ps.setBoolean(2, notification.isOpened());
-            ps.setObject(3, notification.getSent_dt());
-            ps.setLong(4, notification.getActivity().getActivityId());
-            ps.setLong(5, notification.getUser().getUserId());
-            ps.executeUpdate();
+        try (PreparedStatement psInsertNotification = connection.prepareStatement(insertNotificationSQL)) {
+            psInsertNotification.setString(1, notification.getMessage());
+            psInsertNotification.setBoolean(2, notification.isOpened());
+            psInsertNotification.setTimestamp(3, Timestamp.valueOf(notification.getSent_dt()));
+            psInsertNotification.setLong(4, notification.getActivity().getActivityId());
+            psInsertNotification.setLong(5, notification.getUser().getUserId());
+
+            psInsertNotification.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante la creazione della notifica", e);
         }
+        return null;
     }
 
     public List<Notification> getUnreadNotifications(long userId) {
-        String selectSQL = "SELECT * FROM public.\"Notification\" WHERE user_id = ? AND opened = false ORDER BY sent_dt DESC";
+        String getUnreadNotificationsSQL = "SELECT * FROM public.\"Notification\" WHERE user_id = ? AND opened = false ORDER BY sent_dt DESC";
         List<Notification> notifications = new ArrayList<>();
 
-        try (PreparedStatement ps = connection.prepareStatement(selectSQL)) {
-            ps.setLong(1, userId);
-            ResultSet rs = ps.executeQuery();
+        try (PreparedStatement psGetUnreadNotifications = connection.prepareStatement(getUnreadNotificationsSQL)) {
+            psGetUnreadNotifications.setLong(1, userId);
+            ResultSet rs = psGetUnreadNotifications.executeQuery();
 
             while (rs.next()) {
                 Notification notification = new Notification();
                 notification.setNotificationId(rs.getLong("notification_id"));
                 notification.setMessage(rs.getString("message"));
                 notification.setOpened(rs.getBoolean("opened"));
-                notification.setSent_dt(rs.getObject("sent_dt", LocalDateTime.class));
+                notification.setSent_dt(rs.getTimestamp("sent_dt").toLocalDateTime());
                 notifications.add(notification);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante il recupero delle notifiche", e);
         }
-
         return notifications;
-    }
+    }    
 
     public void markAsRead(long notificationId) {
-        String updateSQL = "UPDATE public.\"Notification\" SET opened = true WHERE notification_id = ?";
+        String markAsReadSQL = "UPDATE public.\"Notification\" SET opened = true WHERE notification_id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(updateSQL)) {
-            ps.setLong(1, notificationId);
-            
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new RuntimeException("Notifica non trovata");
-            }
+        try (PreparedStatement psMarkAsRead = connection.prepareStatement(markAsReadSQL)) {
+            psMarkAsRead.setLong(1, notificationId);
+            psMarkAsRead.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante l'aggiornamento della notifica", e);
         }
     }
 
-    public void deleteOldNotifications(long userId, LocalDateTime before) {
-        String deleteSQL = "DELETE FROM public.\"Notification\" WHERE user_id = ? AND sent_dt < ?";
+    public void deleteNotification(long notificationId) {
+        String deleteNotificationSQL = "DELETE FROM public.\"Notification\" WHERE notification_id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(deleteSQL)) {
-            ps.setLong(1, userId);
-            ps.setObject(2, before);
-            ps.executeUpdate();
+        try (PreparedStatement psDeleteNotification = connection.prepareStatement(deleteNotificationSQL)) {
+            psDeleteNotification.setLong(1, notificationId);
+            psDeleteNotification.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione delle notifiche", e);
+            throw new RuntimeException("Errore durante la cancellazione della notifica", e);
         }
     }
 } 

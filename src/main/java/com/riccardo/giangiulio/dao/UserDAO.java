@@ -13,21 +13,6 @@ import com.riccardo.giangiulio.utility.database.DatabaseConnection;
 public class UserDAO {
     private Connection connection = DatabaseConnection.getInstance().getConnection();
 
-    private boolean isEmailExists(String email) {
-        String checkEmailSQL = "SELECT COUNT(*) FROM public.\"User\" WHERE email = ?";
-        
-        try (PreparedStatement psCheckEmail = connection.prepareStatement(checkEmailSQL)) {
-            psCheckEmail.setString(1, email);
-            ResultSet rs = psCheckEmail.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la verifica dell'email", e);
-        }
-        return false;
-    }
-
     public void registerUser(User user) {
         if (isEmailExists(user.getEmail())) {
             throw new RuntimeException("Email già registrata");
@@ -47,8 +32,28 @@ public class UserDAO {
         }
     }
 
+    public User getUserByEmail(String email) {
+        String getUserByEmailSQL = "SELECT user_id, first_name, last_name, email FROM public.\"User\" WHERE email = ?";
+
+        try (PreparedStatement psSelect = connection.prepareStatement(getUserByEmailSQL)) {
+            psSelect.setString(1, email);
+            ResultSet rs = psSelect.executeQuery();
+            if (rs.next()) {
+                User user = new User();
+                user.setUserId(rs.getLong("user_id"));
+                user.setFirstName(rs.getString("first_name"));
+                user.setLastName(rs.getString("last_name"));
+                user.setEmail(rs.getString("email"));
+                return user;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore durante il recupero dell'utente", e);
+        }
+        return null;
+    }
+
     public User getUserById(long userId) {
-        String getUserByIdSQL = "SELECT * FROM public.\"User\" WHERE user_id = ?";
+        String getUserByIdSQL = "SELECT user_id, first_name, last_name, email FROM public.\"User\" WHERE user_id = ?";
 
         try (PreparedStatement psSelect = connection.prepareStatement(getUserByIdSQL)) {
             psSelect.setLong(1, userId);
@@ -75,6 +80,7 @@ public class UserDAO {
             psUpdateUser.setString(1, user.getFirstName());
             psUpdateUser.setString(2, user.getLastName());
             psUpdateUser.setString(3, user.getEmail());
+            psUpdateUser.setLong(4, user.getUserId());
 
             psUpdateUser.executeUpdate();
         } catch (SQLException e) {
@@ -107,33 +113,18 @@ public class UserDAO {
         }
     }
 
-    public User login(String email, String password) {
-        String loginSQL = "SELECT * FROM public.\"User\" WHERE email = ?";
-
-        try (PreparedStatement psLogin = connection.prepareStatement(loginSQL)) {
-            psLogin.setString(1, email);
-            ResultSet rs = psLogin.executeQuery();
-
-            if (!rs.next()) {
-                throw new RuntimeException("Email non registrata");
+    private boolean isEmailExists(String email) {
+        String checkEmailSQL = "SELECT COUNT(*) FROM public.\"User\" WHERE email = ?";
+        
+        try (PreparedStatement psCheckEmail = connection.prepareStatement(checkEmailSQL)) {
+            psCheckEmail.setString(1, email);
+            ResultSet rs = psCheckEmail.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
             }
-
-            String hashedPassword = rs.getString("password");
-            if (!BCrypt.checkpw(password, hashedPassword)) {
-                throw new RuntimeException("Email o password non corrette");
-            }
-
-            return new User(
-                rs.getLong("user_id"),
-                rs.getString("first_name"),
-                rs.getString("last_name"),
-                rs.getString("email"),
-                null
-            );
-
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il login", e);
+            throw new RuntimeException("Errore durante la verifica dell'email", e);
         }
+        return false;
     }
 }
-

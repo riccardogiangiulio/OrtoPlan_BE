@@ -13,29 +13,49 @@ import com.riccardo.giangiulio.utility.database.DatabaseConnection;
 public class ActivityTypeDAO {
     private Connection connection = DatabaseConnection.getInstance().getConnection();
 
-    public void createActivityType(ActivityType activityType) {
-        String insertSQL = "INSERT INTO public.\"ActivityType\"(name) VALUES (?)";
+    public ActivityType createActivityType(ActivityType activityType) {
+        String insertActivityTypeSQL = "INSERT INTO public.\"ActivityType\"(name) VALUES (?)";
 
-        try (PreparedStatement ps = connection.prepareStatement(insertSQL)) {
-            ps.setString(1, activityType.getName());
-            ps.executeUpdate();
+        try (PreparedStatement psInsertActivityType = connection.prepareStatement(insertActivityTypeSQL)) {
+            psInsertActivityType.setString(1, activityType.getName());
+
+            psInsertActivityType.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante la creazione del tipo di attività", e);
         }
+        return null;
+    }
+
+    public ActivityType getActivityTypeById(long activityTypeId) {
+        String getActivityTypeByIdSQL = "SELECT * FROM public.\"ActivityType\" WHERE activity_type_id = ?";
+
+        try (PreparedStatement psGetActivityTypeById = connection.prepareStatement(getActivityTypeByIdSQL)) {
+            psGetActivityTypeById.setLong(1, activityTypeId);
+            ResultSet rs = psGetActivityTypeById.executeQuery();
+            if(rs.next()) {
+                ActivityType activityType = new ActivityType();
+                activityType.setActivityTypeId(rs.getLong("activity_type_id"));
+                activityType.setName(rs.getString("name"));
+                return activityType;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore durante il recupero del tipo di attività", e);
+        }
+        return null;
     }
 
     public List<ActivityType> getAllActivityTypes() {
-        String selectSQL = "SELECT * FROM public.\"ActivityType\"";
+        String getAllActivityTypesSQL = "SELECT * FROM public.\"ActivityType\"";
         List<ActivityType> activityTypes = new ArrayList<>();
 
-        try (PreparedStatement ps = connection.prepareStatement(selectSQL)) {
-            ResultSet rs = ps.executeQuery();
+        try (PreparedStatement psGetAllActivityTypes = connection.prepareStatement(getAllActivityTypesSQL)) {
+            ResultSet rs = psGetAllActivityTypes.executeQuery();
 
             while (rs.next()) {
-                activityTypes.add(new ActivityType(
-                    rs.getLong("activity_type_id"),
-                    rs.getString("name")
-                ));
+                ActivityType activityType = new ActivityType();
+                activityType.setActivityTypeId(rs.getLong("activity_type_id"));
+                activityType.setName(rs.getString("name"));
+                activityTypes.add(activityType);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante il recupero dei tipi di attività", e);
@@ -44,36 +64,12 @@ public class ActivityTypeDAO {
         return activityTypes;
     }
 
-    public ActivityType getActivityTypeById(long activityTypeId) {
-        String selectSQL = "SELECT * FROM public.\"ActivityType\" WHERE activity_type_id = ?";
-
-        try (PreparedStatement ps = connection.prepareStatement(selectSQL)) {
-            ps.setLong(1, activityTypeId);
-            ResultSet rs = ps.executeQuery();
-
-            if (!rs.next()) {
-                throw new RuntimeException("Tipo di attività non trovato");
-            }
-
-            return new ActivityType(
-                activityTypeId,
-                rs.getString("name")
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero del tipo di attività", e);
-        }
-    }
-
     public void deleteActivityType(long activityTypeId) {
-        String deleteSQL = "DELETE FROM public.\"ActivityType\" WHERE activity_type_id = ?";
+        String deleteActivityTypeSQL = "DELETE FROM public.\"ActivityType\" WHERE activity_type_id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(deleteSQL)) {
-            ps.setLong(1, activityTypeId);
-            
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new RuntimeException("Tipo di attività non trovato");
-            }
+        try (PreparedStatement psDeleteActivityType = connection.prepareStatement(deleteActivityTypeSQL)) {
+            psDeleteActivityType.setLong(1, activityTypeId);
+            psDeleteActivityType.executeQuery();
         } catch (SQLException e) {
             throw new RuntimeException("Errore durante la cancellazione del tipo di attività", e);
         }
