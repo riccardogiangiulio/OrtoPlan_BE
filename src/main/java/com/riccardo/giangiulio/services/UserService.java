@@ -18,8 +18,8 @@ public class UserService {
         return userDAO.getUserByEmail(email);
     }
 
-    public void updateUser(User user) {
-        userDAO.updateUser(user);
+    public void updateUser(User updates, long userId) {
+        userDAO.updateUser(updates, userId);
     }
 
     public void updatePassword(long userId, String newPassword) {

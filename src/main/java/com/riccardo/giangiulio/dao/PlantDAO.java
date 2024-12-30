@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 
 import com.riccardo.giangiulio.models.Plant;
@@ -19,8 +20,8 @@ public class PlantDAO {
         try (PreparedStatement psInsertPlant = connection.prepareStatement(insertPlantSQL)) {
             psInsertPlant.setString(1, plant.getName());
             psInsertPlant.setString(2, plant.getDescription());
-            psInsertPlant.setDate(3, java.sql.Date.valueOf(plant.getCultivationStart()));
-            psInsertPlant.setDate(4, java.sql.Date.valueOf(plant.getCultivationEnd()));
+            psInsertPlant.setDate(3, Date.valueOf(plant.getCultivationStart()));
+            psInsertPlant.setDate(4, Date.valueOf(plant.getCultivationEnd()));
             psInsertPlant.setInt(5, plant.getHarvestTime());
 
             psInsertPlant.executeQuery();  
@@ -82,8 +83,8 @@ public class PlantDAO {
         try (PreparedStatement psUpdatePlant = connection.prepareStatement(updatePlantSQL)) {
             psUpdatePlant.setString(1, plant.getName());
             psUpdatePlant.setString(2, plant.getDescription());
-            psUpdatePlant.setDate(3, java.sql.Date.valueOf(plant.getCultivationStart()));
-            psUpdatePlant.setDate(4, java.sql.Date.valueOf(plant.getCultivationEnd()));
+            psUpdatePlant.setDate(3, Date.valueOf(plant.getCultivationStart()));
+            psUpdatePlant.setDate(4, Date.valueOf(plant.getCultivationEnd()));
             psUpdatePlant.setInt(5, plant.getHarvestTime());
             psUpdatePlant.setLong(6, plant.getPlantId());
 

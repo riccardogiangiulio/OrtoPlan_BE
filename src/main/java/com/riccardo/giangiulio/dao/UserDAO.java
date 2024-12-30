@@ -73,18 +73,26 @@ public class UserDAO {
         return null;
     }
 
-    public void updateUser(User user) {
+    public void updateUser(User updates, long userId) {
+        User existingUser = getUserById(userId);
+        if (existingUser == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        String firstName = (updates.getFirstName() == null || updates.getFirstName().isEmpty()) ? existingUser.getFirstName() : updates.getFirstName();
+        String lastName = (updates.getLastName() == null || updates.getLastName().isEmpty()) ? existingUser.getLastName() : updates.getLastName();
+        String email = (updates.getEmail() == null || updates.getEmail().isEmpty()) ? existingUser.getEmail() : updates.getEmail();
         String updateUserSQL = "UPDATE public.\"User\" SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?";
 
         try (PreparedStatement psUpdateUser = connection.prepareStatement(updateUserSQL)) {
-            psUpdateUser.setString(1, user.getFirstName());
-            psUpdateUser.setString(2, user.getLastName());
-            psUpdateUser.setString(3, user.getEmail());
-            psUpdateUser.setLong(4, user.getUserId());
+            psUpdateUser.setString(1, firstName);
+            psUpdateUser.setString(2, lastName);
+            psUpdateUser.setString(3, email);
+            psUpdateUser.setLong(4, userId);
 
             psUpdateUser.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante l'aggiornamento dell'utente", e);
+            throw new RuntimeException("Error updating user", e);
         }
     }
 
