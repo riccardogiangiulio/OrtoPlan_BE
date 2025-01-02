@@ -100,11 +100,18 @@ public class UserDAO {
         String updatePasswordSQL = "UPDATE public.\"User\" SET password = ? WHERE user_id = ?";
 
         try (PreparedStatement psUpdatePassword = connection.prepareStatement(updatePasswordSQL)) {
+            if (newPassword.startsWith("password=")) {
+                newPassword = newPassword.substring("password=".length());
+            }
+            
             String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
             psUpdatePassword.setString(1, hashedPassword);
             psUpdatePassword.setLong(2, userId);
 
-            psUpdatePassword.executeUpdate();
+            int rowsAffected = psUpdatePassword.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new RuntimeException("User not found");
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error updating password", e);
         }
@@ -135,4 +142,30 @@ public class UserDAO {
         }
         return false;
     }
+
+    public User authenticateUser(String email, String password) {
+        String sql = "SELECT user_id, first_name, last_name, email, password FROM public.\"User\" WHERE email = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String hashedPassword = rs.getString("password");
+                if (BCrypt.checkpw(password, hashedPassword)) {
+                    User user = new User();
+                    user.setUserId(rs.getLong("user_id"));
+                    user.setFirstName(rs.getString("first_name"));
+                    user.setLastName(rs.getString("last_name"));
+                    user.setEmail(rs.getString("email"));
+                    return user;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error during authentication", e);
+        }
+        return null;
+    }
+    
+
 }

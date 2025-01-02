@@ -1,5 +1,6 @@
 package com.riccardo.giangiulio;
 
+import com.riccardo.giangiulio.auth.controller.AuthController;
 import com.riccardo.giangiulio.controller.UserController;
 import com.riccardo.giangiulio.services.UserService;
 
@@ -11,7 +12,9 @@ public class App {
 
         UserService userService = new UserService();      
         UserController userController = new UserController(userService);
-        
+        AuthController authController = new AuthController();
+
         userController.registerRoutes(app);
+        authController.registerRoutes(app);
     }
 }
