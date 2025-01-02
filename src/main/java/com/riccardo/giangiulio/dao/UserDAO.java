@@ -15,7 +15,7 @@ public class UserDAO {
 
     public void registerUser(User user) {
         if (isEmailExists(user.getEmail())) {
-            throw new RuntimeException("Email già registrata");
+            throw new RuntimeException("Email already registered");
         }
 
         String insertUserSQL = "INSERT INTO public.\"User\"(first_name, last_name, email, password) VALUES (?, ?, ?, ?)";
@@ -28,7 +28,7 @@ public class UserDAO {
             psInsertUser.setString(4, hashedPassword);
             psInsertUser.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la creazione dell'utente", e);
+            throw new RuntimeException("Error creating user", e);
         }
     }
 
@@ -47,7 +47,7 @@ public class UserDAO {
                 return user;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero dell'utente", e);
+            throw new RuntimeException("Error retrieving user", e);
         }
         return null;
     }
@@ -68,7 +68,7 @@ public class UserDAO {
                 return user;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero dell'utente", e);
+            throw new RuntimeException("Error retrieving user", e);
         }
         return null;
     }
@@ -106,7 +106,7 @@ public class UserDAO {
 
             psUpdatePassword.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante l'aggiornamento della password", e);
+            throw new RuntimeException("Error updating password", e);
         }
     }
 
@@ -117,7 +117,7 @@ public class UserDAO {
             psDeleteUser.setLong(1, userId);
             psDeleteUser.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione dell'utente", e);
+            throw new RuntimeException("Error deleting user", e);
         }
     }
 
@@ -131,7 +131,7 @@ public class UserDAO {
                 return rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la verifica dell'email", e);
+            throw new RuntimeException("Error checking email", e);
         }
         return false;
     }

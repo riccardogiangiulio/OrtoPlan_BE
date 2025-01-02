@@ -26,7 +26,7 @@ public class NotificationDAO {
 
             psInsertNotification.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la creazione della notifica", e);
+            throw new RuntimeException("Error creating notification", e);
         }
         return null;
     }
@@ -48,7 +48,7 @@ public class NotificationDAO {
                 notifications.add(notification);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero delle notifiche", e);
+            throw new RuntimeException("Error retrieving notifications", e);
         }
         return notifications;
     }    
@@ -60,7 +60,7 @@ public class NotificationDAO {
             psMarkAsRead.setLong(1, notificationId);
             psMarkAsRead.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante l'aggiornamento della notifica", e);
+            throw new RuntimeException("Error updating notification", e);
         }
     }
 
@@ -71,7 +71,7 @@ public class NotificationDAO {
             psDeleteNotification.setLong(1, notificationId);
             psDeleteNotification.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione della notifica", e);
+            throw new RuntimeException("Error deleting notification", e);
         }
     }
 } 

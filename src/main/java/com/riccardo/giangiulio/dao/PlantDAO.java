@@ -26,7 +26,7 @@ public class PlantDAO {
 
             psInsertPlant.executeQuery();  
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la creazione della pianta", e);
+            throw new RuntimeException("Error creating plant", e);
         }
         return null;
     }
@@ -49,7 +49,7 @@ public class PlantDAO {
                 return plant;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero della pianta", e);
+            throw new RuntimeException("Error retrieving plant", e);
         }
         return null;
     }
@@ -72,7 +72,7 @@ public class PlantDAO {
                 plants.add(plant);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero delle piante", e);
+            throw new RuntimeException("Error retrieving plants", e);
         }
         return plants;
     }
@@ -90,7 +90,7 @@ public class PlantDAO {
 
             psUpdatePlant.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante l'aggiornamento della pianta", e);
+            throw new RuntimeException("Error updating plant", e);
         }
     }
 
@@ -101,7 +101,7 @@ public class PlantDAO {
             psDeletePlant.setLong(1, plantId);
             psDeletePlant.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione della pianta", e);
+            throw new RuntimeException("Error deleting plant", e);
         }
     }
 } 

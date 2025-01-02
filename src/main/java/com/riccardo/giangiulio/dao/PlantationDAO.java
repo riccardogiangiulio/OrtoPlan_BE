@@ -27,7 +27,7 @@ public class PlantationDAO {
             
             psInsertPlantation.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la creazione della piantagione", e);
+            throw new RuntimeException("Error creating plantation", e);
         }
         return null;
     }
@@ -51,7 +51,7 @@ public class PlantationDAO {
                 plantations.add(plantation);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero delle piantagioni", e);
+            throw new RuntimeException("Error retrieving plantations", e);
         }
         return plantations;
     }
@@ -76,7 +76,7 @@ public class PlantationDAO {
                 return plantation;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero della piantagione", e);
+            throw new RuntimeException("Error retrieving plantation", e);
         }
         return null;
     }
@@ -94,10 +94,10 @@ public class PlantationDAO {
 
             int rowsAffected = psUpdatePlantation.executeUpdate();
             if (rowsAffected == 0) {
-                throw new RuntimeException("Piantagione non trovata o non autorizzato");
+                throw new RuntimeException("Plantation not found or unauthorized");
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante l'aggiornamento della piantagione", e);
+            throw new RuntimeException("Error updating plantation", e);
         }
     }
 
@@ -110,7 +110,7 @@ public class PlantationDAO {
 
             psDeletePlantation.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione della piantagione", e);
+            throw new RuntimeException("Error deleting plantation", e);
         }
     }
 } 

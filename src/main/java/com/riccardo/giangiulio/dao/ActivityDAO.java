@@ -26,7 +26,7 @@ public class ActivityDAO {
 
             psInsertActivity.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la creazione dell'attività", e);
+            throw new RuntimeException("Error creating activity", e);
         }
         return null;
     }
@@ -46,7 +46,7 @@ public class ActivityDAO {
                 return activity;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero dell'attività", e);
+            throw new RuntimeException("Error retrieving activity", e);
         }
         return null;
     }
@@ -68,7 +68,7 @@ public class ActivityDAO {
                 activities.add(activity);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero delle attività", e);
+            throw new RuntimeException("Error retrieving activities", e);
         }
         return activities;
     }
@@ -90,7 +90,7 @@ public class ActivityDAO {
                 activities.add(activity);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero delle attività pendenti", e);
+            throw new RuntimeException("Error retrieving pending activities", e);
         }
         return activities;
     }
@@ -106,10 +106,10 @@ public class ActivityDAO {
 
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected == 0) {
-                throw new RuntimeException("Attività non trovata");
+                throw new RuntimeException("Activity not found");
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante l'aggiornamento dell'attività", e);
+            throw new RuntimeException("Error updating activity", e);
         }
     }
 
@@ -120,7 +120,7 @@ public class ActivityDAO {
             psDeleteActivity.setLong(1, activityId);
             psDeleteActivity.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione dell'attività", e);
+            throw new RuntimeException("Error deleting activity", e);
         }
     }
 } 

@@ -21,7 +21,7 @@ public class ActivityTypeDAO {
 
             psInsertActivityType.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la creazione del tipo di attività", e);
+            throw new RuntimeException("Error creating activity type", e);
         }
         return null;
     }
@@ -39,7 +39,7 @@ public class ActivityTypeDAO {
                 return activityType;
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero del tipo di attività", e);
+            throw new RuntimeException("Error retrieving activity type", e);
         }
         return null;
     }
@@ -58,7 +58,7 @@ public class ActivityTypeDAO {
                 activityTypes.add(activityType);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante il recupero dei tipi di attività", e);
+            throw new RuntimeException("Error retrieving activity types", e);
         }
 
         return activityTypes;
@@ -71,7 +71,7 @@ public class ActivityTypeDAO {
             psDeleteActivityType.setLong(1, activityTypeId);
             psDeleteActivityType.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException("Errore durante la cancellazione del tipo di attività", e);
+            throw new RuntimeException("Error deleting activity type", e);
         }
     }
 } 
