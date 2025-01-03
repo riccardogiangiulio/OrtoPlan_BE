@@ -24,8 +24,10 @@ public class ActivityService {
         return activityDAO.getPendingActivities(plantationId);
     }
 
-    public void updateActivity(Activity activity) {
+    public Activity updateActivity(long activityId, Activity activity) {
+        activity.setActivityId(activityId);
         activityDAO.updateActivity(activity);
+        return activityDAO.getActivityById(activityId);
     }
 
     public void deleteActivity(long activityId) {

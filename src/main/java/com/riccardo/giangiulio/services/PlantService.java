@@ -20,8 +20,8 @@ public class PlantService {
         return plantDAO.getAllPlants();
     }
 
-    public void updatePlant(Plant plant) {
-        plantDAO.updatePlant(plant);
+    public void updatePlant(Plant updates, long plantId) {
+        plantDAO.updatePlant(updates, plantId);
     }
 
     public void removePlant(long plantId) {

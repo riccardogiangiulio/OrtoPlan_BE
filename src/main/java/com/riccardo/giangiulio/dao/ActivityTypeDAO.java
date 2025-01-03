@@ -14,27 +14,33 @@ public class ActivityTypeDAO {
     private Connection connection = DatabaseConnection.getInstance().getConnection();
 
     public ActivityType createActivityType(ActivityType activityType) {
-        String insertActivityTypeSQL = "INSERT INTO public.\"ActivityType\"(name) VALUES (?)";
+        String sql = "INSERT INTO public.\"ActivityType\"(name) VALUES (?) RETURNING type_id";
 
-        try (PreparedStatement psInsertActivityType = connection.prepareStatement(insertActivityTypeSQL)) {
-            psInsertActivityType.setString(1, activityType.getName());
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, activityType.getName());
 
-            psInsertActivityType.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                activityType.setActivityTypeId(rs.getLong("type_id"));
+                return activityType;
+            }
+
+            throw new RuntimeException("Failed to retrieve generated ID");
         } catch (SQLException e) {
-            throw new RuntimeException("Error creating activity type", e);
+            throw new RuntimeException("Error creating activity type: " + e.getMessage(), e);
         }
-        return null;
-    }
+    }   
 
     public ActivityType getActivityTypeById(long activityTypeId) {
-        String getActivityTypeByIdSQL = "SELECT * FROM public.\"ActivityType\" WHERE activity_type_id = ?";
+        String sql = "SELECT type_id, name FROM public.\"ActivityType\" WHERE type_id = ?";
 
-        try (PreparedStatement psGetActivityTypeById = connection.prepareStatement(getActivityTypeByIdSQL)) {
-            psGetActivityTypeById.setLong(1, activityTypeId);
-            ResultSet rs = psGetActivityTypeById.executeQuery();
-            if(rs.next()) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, activityTypeId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
                 ActivityType activityType = new ActivityType();
-                activityType.setActivityTypeId(rs.getLong("activity_type_id"));
+                activityType.setActivityTypeId(rs.getLong("type_id"));
                 activityType.setName(rs.getString("name"));
                 return activityType;
             }
@@ -45,33 +51,34 @@ public class ActivityTypeDAO {
     }
 
     public List<ActivityType> getAllActivityTypes() {
-        String getAllActivityTypesSQL = "SELECT * FROM public.\"ActivityType\"";
+        String sql = "SELECT type_id, name FROM public.\"ActivityType\"";
         List<ActivityType> activityTypes = new ArrayList<>();
 
-        try (PreparedStatement psGetAllActivityTypes = connection.prepareStatement(getAllActivityTypesSQL)) {
-            ResultSet rs = psGetAllActivityTypes.executeQuery();
-
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ActivityType activityType = new ActivityType();
-                activityType.setActivityTypeId(rs.getLong("activity_type_id"));
+                activityType.setActivityTypeId(rs.getLong("type_id"));
                 activityType.setName(rs.getString("name"));
                 activityTypes.add(activityType);
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving activity types", e);
         }
-
         return activityTypes;
     }
 
     public void deleteActivityType(long activityTypeId) {
-        String deleteActivityTypeSQL = "DELETE FROM public.\"ActivityType\" WHERE activity_type_id = ?";
+        String sql = "DELETE FROM public.\"ActivityType\" WHERE type_id = ?";
 
-        try (PreparedStatement psDeleteActivityType = connection.prepareStatement(deleteActivityTypeSQL)) {
-            psDeleteActivityType.setLong(1, activityTypeId);
-            psDeleteActivityType.executeQuery();
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setLong(1, activityTypeId);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new RuntimeException("Activity type not found");
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Error deleting activity type", e);
         }
     }
-} 
+}

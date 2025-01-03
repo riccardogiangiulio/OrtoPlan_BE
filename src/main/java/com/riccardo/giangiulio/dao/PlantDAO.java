@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.sql.Date;
 import java.util.List;
+import java.time.LocalDate;
 
 import com.riccardo.giangiulio.models.Plant;
 import com.riccardo.giangiulio.utility.database.DatabaseConnection;
@@ -24,7 +25,7 @@ public class PlantDAO {
             psInsertPlant.setDate(4, Date.valueOf(plant.getCultivationEnd()));
             psInsertPlant.setInt(5, plant.getHarvestTime());
 
-            psInsertPlant.executeQuery();  
+            psInsertPlant.executeUpdate();  
         } catch (SQLException e) {
             throw new RuntimeException("Error creating plant", e);
         }
@@ -77,16 +78,29 @@ public class PlantDAO {
         return plants;
     }
 
-    public void updatePlant(Plant plant) {
+    public void updatePlant(Plant updates, long plantId) {
+        // Prima ottieni la pianta esistente
+        Plant existingPlant = getPlantById(plantId);
+        if (existingPlant == null) {
+            throw new RuntimeException("Plant not found");
+        }
+
+        // Prepara i valori da aggiornare, usando i valori esistenti se non specificati
+        String name = (updates.getName() == null || updates.getName().isEmpty()) ? existingPlant.getName() : updates.getName();
+        String description = (updates.getDescription() == null) ? existingPlant.getDescription() : updates.getDescription();
+        LocalDate cultivationStart = (updates.getCultivationStart() == null) ? existingPlant.getCultivationStart() : updates.getCultivationStart();
+        LocalDate cultivationEnd = (updates.getCultivationEnd() == null) ? existingPlant.getCultivationEnd() : updates.getCultivationEnd();
+        int harvestTime = (updates.getHarvestTime() == 0) ? existingPlant.getHarvestTime() : updates.getHarvestTime();
+
         String updatePlantSQL = "UPDATE public.\"Plant\" SET name = ?, description = ?, cultivation_start = ?, cultivation_end = ?, harvest_time = ? WHERE plant_id = ?";
 
         try (PreparedStatement psUpdatePlant = connection.prepareStatement(updatePlantSQL)) {
-            psUpdatePlant.setString(1, plant.getName());
-            psUpdatePlant.setString(2, plant.getDescription());
-            psUpdatePlant.setDate(3, Date.valueOf(plant.getCultivationStart()));
-            psUpdatePlant.setDate(4, Date.valueOf(plant.getCultivationEnd()));
-            psUpdatePlant.setInt(5, plant.getHarvestTime());
-            psUpdatePlant.setLong(6, plant.getPlantId());
+            psUpdatePlant.setString(1, name);
+            psUpdatePlant.setString(2, description);
+            psUpdatePlant.setDate(3, Date.valueOf(cultivationStart));
+            psUpdatePlant.setDate(4, Date.valueOf(cultivationEnd));
+            psUpdatePlant.setInt(5, harvestTime);
+            psUpdatePlant.setLong(6, plantId);
 
             psUpdatePlant.executeUpdate();
         } catch (SQLException e) {

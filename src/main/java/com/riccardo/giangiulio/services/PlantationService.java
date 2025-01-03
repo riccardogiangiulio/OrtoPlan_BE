@@ -20,8 +20,8 @@ public class PlantationService {
         return plantationDAO.getPlantationById(plantationId);
     }
 
-    public void updatePlantation(Plantation plantation) {
-        plantationDAO.updatePlantation(plantation);
+    public void updatePlantation(Plantation updates, long plantationId) {
+        plantationDAO.updatePlantation(updates, plantationId);
     }
 
     public void deletePlantation(long plantationId, long userId) {

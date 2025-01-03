@@ -89,7 +89,7 @@ public class UserController {
         try {
             long userId = Long.parseLong(ctx.pathParam("userId"));
             userService.deleteUser(userId);
-            ctx.status(204);
+            ctx.status(204).result("User deleted successfully");
         } catch (NumberFormatException e) {
             ctx.status(400).result("Invalid user ID");
         }

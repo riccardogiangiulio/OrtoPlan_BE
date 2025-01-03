@@ -15,20 +15,27 @@ public class NotificationDAO {
     private Connection connection = DatabaseConnection.getInstance().getConnection();
 
     public Notification createNotification(Notification notification) {
-        String insertNotificationSQL = "INSERT INTO public.\"Notification\"(message, opened, sent_dt, activity_id, user_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO public.\"Notification\" (message, sent_dt, opened, activity_id, user_id) " +
+                    "VALUES (?, ?, ?, ?, ?) RETURNING notification_id";
 
-        try (PreparedStatement psInsertNotification = connection.prepareStatement(insertNotificationSQL)) {
-            psInsertNotification.setString(1, notification.getMessage());
-            psInsertNotification.setBoolean(2, notification.isOpened());
-            psInsertNotification.setTimestamp(3, Timestamp.valueOf(notification.getSent_dt()));
-            psInsertNotification.setLong(4, notification.getActivity().getActivityId());
-            psInsertNotification.setLong(5, notification.getUser().getUserId());
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, notification.getMessage());
+            ps.setTimestamp(2, Timestamp.valueOf(notification.getSent_dt()));
+            ps.setBoolean(3, notification.isOpened());
+            ps.setLong(4, notification.getActivity().getActivityId());
+            ps.setLong(5, notification.getUser().getUserId());
 
-            psInsertNotification.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                notification.setNotificationId(rs.getLong("notification_id"));
+                return notification;
+            }
+            throw new RuntimeException("Failed to retrieve generated ID");
         } catch (SQLException e) {
-            throw new RuntimeException("Error creating notification", e);
+            e.printStackTrace();
+            throw new RuntimeException("Error creating notification: " + e.getMessage());
         }
-        return null;
     }
 
     public List<Notification> getUnreadNotifications(long userId) {
