@@ -1,6 +1,5 @@
 package com.riccardo.giangiulio.auth.middleware;
 
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.riccardo.giangiulio.auth.util.JwtUtil;
 
 import io.javalin.http.Context;
@@ -22,7 +21,7 @@ public class JwtAuthMiddleware implements Handler {
         try {
             String email = JwtUtil.validateToken(token);
             ctx.attribute("email", email);
-        } catch (JWTVerificationException e) {
+        } catch (Exception e) {
             ctx.status(401).result("Invalid or expired token");
         }
     }

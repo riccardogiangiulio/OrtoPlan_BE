@@ -74,14 +74,12 @@ public class PlantationController {
         try {
             long plantationId = Long.parseLong(ctx.pathParam("plantationId"));
             
-            // Prima verifichiamo che la plantation esista
             Plantation plantation = plantationService.getPlantationById(plantationId);
             if (plantation == null) {
                 ctx.status(404).result("Plantation not found");
                 return;
             }
 
-            // Otteniamo l'userId dalla plantation stessa
             long userId = plantation.getUser().getUserId();
             
             plantationService.deletePlantation(plantationId, userId);

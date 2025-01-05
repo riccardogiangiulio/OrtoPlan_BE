@@ -19,6 +19,7 @@ public class AuthController {
             String email = ctx.formParam("email");
             String password = ctx.formParam("password");
 
+
             if (email == null || password == null) {
                 ctx.status(400).result("Email and password are required");
                 return;
@@ -35,6 +36,7 @@ public class AuthController {
             ctx.json(new TokenResponse(token));
     
         } catch (Exception e) {
+            System.out.println("Login error: " + e.getMessage()); // Debug log
             ctx.status(400).result("Invalid request");
         }
     }
