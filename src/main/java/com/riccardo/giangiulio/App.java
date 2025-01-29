@@ -18,7 +18,7 @@ import io.javalin.Javalin;
 
 public class App {
     public static void main(String[] args) {
-        
+
         Javalin app = Javalin.create(config -> {
             config.plugins.enableCors(cors -> {
                 cors.add(it -> {
@@ -26,7 +26,7 @@ public class App {
                 });
             });
         }).start(7070);
-
+        // rpova per Tag di JIRA
         UserService userService = new UserService();      
         PlantService plantService = new PlantService();
         PlantationService plantationService = new PlantationService();
