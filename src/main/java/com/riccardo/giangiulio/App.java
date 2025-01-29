@@ -26,7 +26,6 @@ public class App {
                 });
             });
         }).start(7070);
-        // rpova per Tag di JIRA
         UserService userService = new UserService();      
         PlantService plantService = new PlantService();
         PlantationService plantationService = new PlantationService();
